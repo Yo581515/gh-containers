@@ -11,8 +11,10 @@ jobs:
   test:
     environment: testing
     runs-on: ubuntu-latest
-#    container:
-#      image: node:16
+    #    outputs:
+    #      klarte-jeg-det: ${{ steps.sette-ut.outputs.resultat }}
+    container:
+      image: node:16
     env:
       MONGODB_CONNECTION_PROTOCOL: mongodb
       MONGODB_CLUSTER_ADDRESS: localhost:27017
@@ -27,6 +29,8 @@ jobs:
           MONGO_INITDB_ROOT_PASSWORD: example
         ports:
           - 27017:27017
+    outputs:
+      klarte-jeg-det: ${{ steps.sette-ut.outputs.resultat }}
     steps:
       - name: Get Code
         uses: actions/checkout@v4
@@ -44,6 +48,9 @@ jobs:
       - name: Output information
         run: |
           echo "MONGODB_USERNAME: $MONGODB_USERNAME"
+      - name: Get output
+        id: sette-ut
+        run: echo 'resultat=ja,du klarte det :)!' >> $GITHUB_OUTPUT
   deploy:
     needs: test
     runs-on: ubuntu-latest
@@ -55,3 +62,5 @@ jobs:
           echo "MONGODB_DB_NAME: $MONGODB_DB_NAME"
           echo "MONGODB_USERNAME: $MONGODB_USERNAME"
           echo "${{ env.PORT }}"
+      - name: Teste min output
+        run: echo "klarte jeg det? ${{ needs.test.outputs.klarte-jeg-det }}"
